@@ -1,0 +1,20 @@
+Cellular System
+
+Mean interarrival time      2.500 minutes
+
+Mean service time          10.000 minutes
+
+Number of calls          1000
+
+num_call_arrived: 471 
+num_call_rejected: 376 
+num_handoff_arrived: 529 
+num_hadoff_rejected: 423 
+
+u:        0.100 calls per minute 
+p:        0.500 
+U:        0.945 
+CBP:        0.798 
+HDP:        0.800 
+Time simulation ended    1267.056 minutes
+area_channel_utilization  119706.950 
