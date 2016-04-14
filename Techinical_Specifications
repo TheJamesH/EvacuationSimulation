@@ -17,7 +17,7 @@ Components needed for simulation program.
        - Identify bottleneck nodes (compare door pools max size?)
    - generate output file with data
 
--Scenario programs
+-Scenario programs (or input file? might get complicated for reading in)
    - Sets up actors and environment nodes/connections
    - Alarm delay, starting alert node
    - Fill containers for Nodes and Actors
