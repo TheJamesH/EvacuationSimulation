@@ -15,6 +15,7 @@ Components needed for simulation program.
    - collects information (data collection within Nodes and Actors?)
        - Total/Average evacuation time
        - Identify bottleneck nodes (compare door pools max size?)
+   - generate output file with data
 
 -Scenario programs
    - Sets up actors and environment nodes/connections
