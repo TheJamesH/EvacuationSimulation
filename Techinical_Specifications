@@ -1,7 +1,7 @@
 Components needed for simulation program.
 
 - Room node system (structs?)
-   - Room, Door, Outside
+   - Room, Door, Outside (1 Oustside node is set up in main, used for data collection)
    - Connections, Alertness, Actor pool (for door)
 
 - Actor system (structs?)
