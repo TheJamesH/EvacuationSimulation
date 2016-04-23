@@ -1,14 +1,14 @@
-/* External definitions for a Cellular System. */
+/* Evacuation simulation prgram. */
 
 #include <stdio.h>  
 #include <math.h>
 #include "lcgrand.h"  /* Header file for random-number generator. */
 #include <windows.h>
 
-#define NChannels 100  /* Number of Servers. */
-#define N_LIMIT 100
+//#define NChannels 100
+//#define N_LIMIT 100
 
-int   next_event_type, num_events, num_channels, num_call_arrived, num_call_rejected, num_handoff_arrived, num_hadoff_rejected, num_calls_required;
+int   actorNum;
 float mean_interarrival, mean_service, sim_time, time_arrival[N_LIMIT + 1], time_last_event, time_next_event[4];
 double area_channel_utilization;
 FILE  *infile, *outfile;
@@ -39,32 +39,28 @@ main()  /* Main function. */
 		perror("Error opening outfile");
 		return;
 	}
-	num_channels = NChannels;
 
-    /* Specify the number of events for the timing function. */
+	/* Set up Outside node. */
 
-    num_events = 3;
+    /* Read input simulation. */
 
-    /* Read input parameters. */
-
-    fscanf(infile, "%f %f %d", &mean_interarrival, &mean_service,
-           &num_calls_required);
+    //fscanf(infile, "%f %f %d", &mean_interarrival, &mean_service, &num_calls_required);
 
     /* Write report heading and input parameters. */
 
-    fprintf(outfile, "Cellular System\n\n");
+    /*fprintf(outfile, "Cellular System\n\n");
     fprintf(outfile, "Mean interarrival time%11.3f minutes\n\n",
             mean_interarrival);
     fprintf(outfile, "Mean service time%16.3f minutes\n\n", mean_service);
-    fprintf(outfile, "Number of calls%14d\n\n", num_calls_required);
+    fprintf(outfile, "Number of calls%14d\n\n", num_calls_required); */
 
     /* Initialize the simulation. */
 
     initialize();
 
-    /* Run the simulation while more delays are still needed. */
+    /* Run the simulation while all actors have not reached outside node. */
 
-    while ((num_call_arrived + num_handoff_arrived) < num_calls_required)
+    while ()
     {
         /* Determine the next event. */
 
