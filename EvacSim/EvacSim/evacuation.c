@@ -14,9 +14,8 @@ typedef struct {
 	int * distance_adjacencies;	// List containing the distance to the rooms it connects to, adjancency[i]=distance[i]
 	int number_of_connections;  // Number of connections made
 	int isAlarmed;				// 0 = Node is not aware of the situation; 1 = Node is aware of the situation
-	int door_pool;				// Only applicable if isDoor == 1; The amount of people at the door
-	int door_flow;				// Amount of time it takes to travel through door
 	int population;				// Number of people in the room
+	int max_population;			// Maximum number of people in the room at any given time
 } Node;
 
 /* List queues */
@@ -28,7 +27,7 @@ int enter_door_head, enter_door_tail = 0;
 int exit_building_head, exit_node_tail = 0;
 
 /* Input Variables and sutff used through out program */
-int time_delay, alarm_delay, actor_num, node_num, total_people;
+int time_delay, alarm_delay, actor_num, node_num, total_people, cumulative_time;
 Node * nodelist;
 
 /* Statistics to output */
@@ -37,14 +36,15 @@ Node * nodelist;
 void seedNodes(void);
 void enterNode(void);
 void enterDoor(void);
-void exitBuilding(void);
 void alarm(void);
 void report(void);
 
-int main() {
+int main() 
+{
 	/* Read in the input file */
 	FILE * input_pointer = fopen("evacsim.in", "r");
-	if (input_pointer == NULL) {
+	if (input_pointer == NULL) 
+	{
 		fprintf(stderr, "File 'evacsim.in' was not opened successfully");
 		return -1;
 	}
@@ -58,16 +58,16 @@ int main() {
 
 	/* Create the node adjacencies using the file */
 	int i, j; Node curr_node;
-	for (i = 0; i<node_num; i++) {
+	for (i = 0; i<node_num; i++) 
+	{
 		curr_node = nodelist[i];
-		curr_node.door_flow = 1;
 		curr_node.population = 0;
-		curr_node.door_pool = 0;
 
 		fscanf(input_pointer, "%d\n%d\n", &(curr_node.isDoor), &(curr_node.number_of_connections));
 		curr_node.adjacencies = malloc(sizeof(int) * curr_node.number_of_connections);
 
-		for (j = 0; j < curr_node.number_of_connections; j++) {
+		for (j = 0; j < curr_node.number_of_connections; j++) 
+		{
 			fscanf(input_pointer, "%d %d\n", curr_node.adjacencies[j],curr_node.distance_adjacencies[j]);
 		}
 	}
@@ -94,7 +94,9 @@ int main() {
 	set_first_event();
 
 	/* Run the simulation until the time is up */
-	do {
+	int last_escape_time = 0;
+	do 
+	{
 		timing();
 		switch (next_event_type) {
 		case EVENT_ENTER_NODE:
@@ -104,7 +106,8 @@ int main() {
 			enterDoor();
 			break;
 		case EVENT_EXIT_BUILDING:
-			exitBuilding();
+			total_people--;
+			cumulative_time += sim_time-last_escape_time;
 			break;
 		case EVENT_ALARM_ALL:
 			alarm();
@@ -139,41 +142,10 @@ void set_first_event()
 	int r = rand();
 	/* Set the node to alarmed */
 	nodelist[r].isAlarmed = 1;
+	event_schedule(sim_time + 1, EVENT_ENTER_NODE);
 
-	/* Check if the room has a door */
-	int i;
-	for (i = 0; i < nodelist[r].number_of_connections; i++) {
-		/* NOTE: It didn't like me not using the next two lines */
-		int * adj = nodelist[r].adjacencies;
-		int adjacent_node_num = adj[i];
-		
-		/* If there is a door, schedule an Enter Door event for each person in the room */
-		if (nodelist[adjacent_node_num].isDoor == 1) {
-			event_schedule(sim_time + nodelist[r].distance_adjacencies[i], EVENT_ENTER_DOOR);
-
-			nodelist[adjacent_node_num].door_pool += nodelist[r].population;
-			nodelist[r].population = 0;
-			
-			enter_door_queue[enter_door_tail] = r;
-			enter_door_tail = (enter_door_tail + 1) % actor_num;
-			return;
-		}
-	}
-
-	/* There is no door, so each person is going to enter a random adjacent node */
-	srand(nodelist[r].number_of_connections);
-	int j;
-	while(nodelist[r].population > 0) {
-		int random_node_adj = rand();
-
-		event_schedule(sim_time + nodelist[r].distance_adjacencies[random_node_adj], EVENT_ENTER_NODE);
-
-		nodelist[random_node_adj].population++;
-		nodelist[r].population--;
-
-		enter_node_queue[enter_node_tail] = r;
-		enter_node_tail = (enter_node_tail + 1) % actor_num;
-	}
+	enter_node_queue[enter_node_tail] = r;
+	enter_node_tail = (enter_node_tail + 1) % actor_num;
 }
 
 void enterNode() /* Enter a new node event function */
@@ -186,14 +158,19 @@ void enterNode() /* Enter a new node event function */
 
 	/* Check if the room has a door */
 	int i;
-	for (i = 0; i < nodelist[r].number_of_connections; i++) {
+	for (i = 0; i < nodelist[r].number_of_connections; i++) 
+	{
 		/* NOTE: It didn't like me not using the next two lines */
 		int * adj = nodelist[r].adjacencies;
 		int adjacent_node_num = adj[i];
 
 		/* If there is a door, schedule an Enter Door event */
-		if (nodelist[adjacent_node_num].isDoor == 1) {
+		if (nodelist[adjacent_node_num].isDoor == 1) 
+		{
 			event_schedule(sim_time + nodelist[r].distance_adjacencies[i], EVENT_ENTER_DOOR);
+
+			nodelist[adjacent_node_num].population += nodelist[r].population;
+			nodelist[r].population = 0;
 
 			/* Add to the enter door queue */
 			enter_door_queue[enter_door_tail] = r;
@@ -205,7 +182,8 @@ void enterNode() /* Enter a new node event function */
 	/* There is no door, so enter a random node */
 	srand(nodelist[r].number_of_connections);
 	int j;
-	while(nodelist[r].population > 0) {
+	while(nodelist[r].population > 0) 
+	{
 		int random_node_adj = rand();
 
 		event_schedule(sim_time + nodelist[r].distance_adjacencies[random_node_adj], EVENT_ENTER_NODE);
@@ -215,16 +193,67 @@ void enterNode() /* Enter a new node event function */
 
 		enter_node_queue[enter_node_tail] = r;
 		enter_node_tail = (enter_node_tail + 1) % actor_num;
+
+		check_max_pop(random_node_adj);
 	}
 }
 
 void enterDoor()
 {
-	/* Add new agent to */
+	int doorNum = enter_door_queue[enter_door_head];
+	enter_door_head = (enter_door_head + 1) % actor_num;
+
+	check_max_pop(doorNum);
+
+	nodelist[doorNum].population--;
+	/* The actors can only exit the building one at a time */
+	event_schedule(sim_time + 1, EVENT_EXIT_BUILDING);
+	
+	/* If there are more people in the node, schedule another door event*/
+	if (nodelist[doorNum].population != 0) 
+	{
+		event_schedule(sim_time + 1, EVENT_ENTER_DOOR);
+		
+		enter_door_queue[enter_door_tail] = doorNum;
+		enter_door_tail = (enter_door_tail + 1) % actor_num;
+	}
 }
 
-void exitBuilding() {}
+void alarm() 
+{	
+	int i;
+	for (i = 0; i < node_num; i++) 
+	{
+		if (nodelist[i].isAlarmed == 0) {
+			nodelist[i].isAlarmed = 1;
+			event_schedule(sim_time + 1, EVENT_ENTER_NODE);
+			
+			enter_node_queue[enter_door_tail] = i;
+			enter_node_tail = (enter_node_tail + 1) % actor_num;
+		}
+	}
+}
 
-void alarm() {}
+void report() 
+{
+	FILE * output = fopen("evac.out", "w");
 
-void report() {}
+	fprintf(output, "Total Number of Actors: %d \n", actor_num);
+	fprintf(output, "Time for all people to escape: %d\n", sim_time);
+	fprintf(output, "Average time to escape: %d\n", cumulative_time / sim_time);
+	
+	int i;
+	for (i=0;i<node_num; i++)
+	{
+		fprintf(output, "Max Pop in Node %d: %d \n", i, nodelist[i].max_population);
+		fprintf(output, "Max Pop in Node %d: ??? \n \n", i);
+	}
+
+	fclose(output);
+}
+
+void check_max_pop(int node) {
+	if (nodelist[node].population > nodelist[node].max_population) {
+		nodelist[node].max_population = nodelist[node].population;
+	}
+}
