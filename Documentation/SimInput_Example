@@ -5,20 +5,20 @@
 //Node 1
 0 //node type 0=room 1=door
 1 //number of node connections
-3 //conects to node 3
+3 5 //conects to node 3 takes 5 units of time to reach
 //Node 2
 0
 1
-4
+4 5
 //Node 3
 0
 1
-5
+5 5
 //Node 4
 0
 1
-5
+5 5
 //Node 5
 1 //type is door
 1
--1 //a -1 value denotes that the node should conect to the outside node
+-1 0 //a -1 value denotes that the node should conect to the outside node
