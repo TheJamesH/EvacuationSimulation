@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "simlibdefs.h"
+#include "..\simlibdefs.h"
 
 /* Declare simlib global variables. */
 
@@ -98,7 +98,7 @@ void list_file(int option, int list)
 
     struct master *row, *ahead, *behind, *ihead, *itail;
     int    item, postest;
-
+	row = NULL;
     /* If the list value is improper, stop the simulation. */
 
     if(!((list >= 0) && (list <= MAX_LIST))) {
@@ -236,7 +236,7 @@ void list_remove(int option, int list)
             LAST  remove last record in the list */
 
     struct master *row, *ihead, *itail;
-
+	row = NULL;
     /* If the list value is improper, stop the simulation. */
 
     if(!((list >= 0) && (list <= MAX_LIST))) {
@@ -749,7 +749,7 @@ static long zrng[] =
 
 /* Generate the next random number. */
 
-float lcgrand(int stream)
+static float lcgrand(int stream)
 {
     long zi, lowprd, hi31;
 
@@ -769,14 +769,14 @@ float lcgrand(int stream)
 }
 
 
-void lcgrandst (long zset, int stream) /* Set the current zrng for stream
+static void lcgrandst (long zset, int stream) /* Set the current zrng for stream
                                           "stream" to zset. */
 {
     zrng[stream] = zset;
 }
 
 
-long lcgrandgt (int stream) /* Return the current zrng for stream "stream". */
+static long lcgrandgt (int stream) /* Return the current zrng for stream "stream". */
 {
     return zrng[stream];
 }
