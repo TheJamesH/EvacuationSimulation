@@ -281,7 +281,7 @@ void report()
 	}
 
 	fclose(output);
-} //Hi
+} 
 
 void check_max_pop(int node) {
 	if (nodelist[node].population > nodelist[node].max_population) {
