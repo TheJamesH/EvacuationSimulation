@@ -270,6 +270,7 @@ void report()
 
 	fprintf(output, "Total Number of Actors: %d \n", actor_num);
 	fprintf(output, "Time for all people to escape: %f\n", sim_time);
+	fprintf(output, "Average time to escape: %f\n\n", cumulative_time / sim_time);
 
 	int i;
 	for (i = 0; i<node_num; i++)
@@ -283,6 +284,6 @@ void report()
 
 void check_max_pop(int node) {
 	if (nodelist[node].population > nodelist[node].max_population) {
-		nodelist[node].max_population = nodelist[node].population;
+		nodelist[node].max_population = nodelist[node].population;//Hi
 	}
 }
