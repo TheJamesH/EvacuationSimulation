@@ -101,7 +101,7 @@ int main()
 	set_first_event();
 
 	/* Run the simulation until the time is up */
-	int last_escape_time = 0;
+	float last_escape_time = 0.0;
 	do
 	{
 		timing();
@@ -116,6 +116,7 @@ int main()
 		case EVENT_EXIT_BUILDING:
 			total_people--;
 			cumulative_time += sim_time;
+			//last_escape_time = sim_time;
 			break;
 		case EVENT_ALARM_ALL:
 			alarm();
@@ -270,7 +271,7 @@ void report()
 
 	fprintf(output, "Total Number of Actors: %d \n", actor_num);
 	fprintf(output, "Time for all people to escape: %f\n", sim_time);
-	fprintf(output, "Average time to escape: %f\n\n", cumulative_time / sim_time);
+	fprintf(output, "Average time to escape: %f\n\n", cumulative_time / actor_num);
 
 	int i;
 	for (i = 0; i<node_num; i++)
