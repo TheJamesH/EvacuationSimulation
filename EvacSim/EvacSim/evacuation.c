@@ -280,7 +280,7 @@ void report()
 		fprintf(output, "Max Pop in Node %d: ??? \n \n", i);
 	}
 
-	fclose(output);
+	fclose(output);//Hi
 } 
 
 void check_max_pop(int node) {
